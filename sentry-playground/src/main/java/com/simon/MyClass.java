@@ -1,5 +1,7 @@
 package com.simon;
 
+import java.util.UUID;
+
 import io.sentry.Sentry;
 import io.sentry.SentryClient;
 import io.sentry.SentryClientFactory;
@@ -40,7 +42,7 @@ public class MyClass {
 		sentry = SentryClientFactory.sentryClient();
 
 		MyClass myClass = new MyClass();
-		myClass.logWithStaticAPI();
+		//myClass.logWithStaticAPI();
 		myClass.logWithInstanceAPI();
 		
 		// Sleep for a while to allow event to get sent.
@@ -55,7 +57,7 @@ public class MyClass {
 	 * An example method that throws an exception.
 	 */
 	void unsafeMethod() {
-		throw new UnsupportedOperationException("You shouldn't call this!");
+		throw new UnsupportedOperationException("You shouldn't call this again!");
 	}
 
 	/**
@@ -106,10 +108,16 @@ public class MyClass {
 		context.recordBreadcrumb(new BreadcrumbBuilder().setMessage("User made an action").build());
 
 		// Set the user in the current context.
-		context.setUser(new UserBuilder().setEmail("hello@sentry.io").build());
+		context.setUser(new UserBuilder().setEmail("s.curran@liberty-it.co.uk").build());
 
+		// Add extra data to future events in this context.
+		context.addExtra("transactionId", UUID.randomUUID().toString());
+
+		// Add an additional tag to future events in this context.
+		context.addTag("operationName", "createOption");
+		
 		// This sends a simple event to Sentry.
-		sentry.sendMessage("This is a test");
+		sentry.sendMessage("This is a test with the instance API");
 
 		try {
 			unsafeMethod();
